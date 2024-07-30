@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "booklibrary"
+version = "0.1.0"
+description = ""
+authors = ["Rauan Kassymkhanov <rauan.kassymkhanov@nixs.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.1"
+uvicorn = "^0.30.3"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+alembic = "^1.13.2"
+pydantic = "^2.8.2"
+psycopg = "^3.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+ruff = "^0.5.5"
+
+[tool.ruff]
+line-length = 120
+select = ["E", "W", "F"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
