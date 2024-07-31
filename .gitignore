@@ -2,3 +2,13 @@
 .poetry/
 poetry.lock
 __pycache__
+<<<<<<< HEAD
+=======
+
+
+.poetry/
+poetry.lock
+__pycache__
+
+
+>>>>>>> 3313154 (Fix)
