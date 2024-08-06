@@ -1,11 +1,7 @@
-from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
-from typing import Annotated
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import mapped_column, Mapped
 
-
-class Base(DeclarativeBase):
-    str32 = Annotated[str, mapped_column(String(32))]
-    intpk = Annotated[int, mapped_column(primary_key=True)]
+from app.database import Base
 
 
 class BooksAuthors(Base):
