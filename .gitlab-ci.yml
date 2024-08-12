@@ -1,0 +1,38 @@
+default:
+  image: python:latest
+
+
+services:
+  - postgres:14
+variables:
+  POSTGRES_DB: booklibrary_test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_HOST: postgres
+
+
+before_script:
+  - pip install --upgrade pip
+  - pip install poetry
+  - poetry install
+
+
+stages:
+  - lint-and-test
+
+
+cache:
+  paths:
+    - .cache/pypoetry
+
+
+linter-job:
+  stage: lint-and-test
+  script:
+    - poetry run ruff check .
+
+
+test-job:
+  stage: lint-and-test
+  script:
+    - poetry run pytest -v

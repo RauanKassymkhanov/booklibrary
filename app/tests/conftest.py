@@ -21,7 +21,7 @@ def pytest_configure(config: pytest.Config):
     file after command line options have been parsed.
     """
     os.environ['ENVIRONMENT'] = 'test'
-    os.environ['DATABASE_URL'] = 'postgresql+psycopg://postgres:postgres@localhost:5433/booklibrary_test'
+    os.environ['DATABASE_URL'] = 'postgresql+psycopg://postgres:postgres@postgres:5432/booklibrary_test'
 
 
 def override_app_test_dependencies(app: FastAPI) -> None:
