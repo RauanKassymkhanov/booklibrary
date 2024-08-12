@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -17,9 +15,9 @@ services:
   db:
     image: postgres:14
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: BookLibrary
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

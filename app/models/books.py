@@ -1,9 +1,10 @@
 from sqlalchemy import Date, ForeignKey, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from app.models.base import Base, BooksGenres, BooksAuthors
+from app.models.base import BooksGenres, BooksAuthors
+from app.database import Base
 
 
-class Book(Base):
+class BookModel(Base):
     __tablename__ = "books"
     id: Mapped[Base.intpk]
     title: Mapped[Base.str32]
@@ -12,5 +13,8 @@ class Book(Base):
     genre_id: Mapped[int] = mapped_column(ForeignKey("genres.id", ondelete="CASCADE"))
     description: Mapped[str] = mapped_column(Text)
 
-    authors: Mapped[list["Author"]] = relationship("Author", secondary=BooksAuthors, back_populates="books")
-    genres: Mapped[list["Genre"]] = relationship("Genre",secondary=BooksGenres, back_populates="books")
+    authors: Mapped[list["AuthorModel"]] = relationship("AuthorModel", secondary=BooksAuthors.__tablename__,
+                                                        back_populates="books")
+    genres: Mapped[list["GenreModel"]] = relationship("GenreModel", secondary=BooksGenres.__tablename__,
+                                                     back_populates="books")
+
