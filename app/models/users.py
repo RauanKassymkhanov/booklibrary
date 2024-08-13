@@ -1,6 +1,10 @@
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base
 import uuid
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.subscriptions import SubscriptionModel
 
 
 class UserModel(Base):

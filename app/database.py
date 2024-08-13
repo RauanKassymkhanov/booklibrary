@@ -1,11 +1,11 @@
 from typing import Annotated, AsyncIterable
-
 from pydantic import PostgresDsn
 from sqlalchemy import create_engine, String
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, mapped_column
 from app.config import get_settings
 from app.session_manager import session_manager
+from alembic.config import Config
 
 
 def get_engine():
@@ -28,8 +28,6 @@ async def get_session() -> AsyncIterable[AsyncSession]:
     async with session_manager() as session:
         yield session
 
-
-from alembic.config import Config
 
 
 def get_alembic_config(database_url: PostgresDsn, script_location: str = 'migrations') -> Config:

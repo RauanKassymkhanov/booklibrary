@@ -2,6 +2,11 @@ from sqlalchemy import Date, ForeignKey, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.models.base import BooksGenres, BooksAuthors
 from app.database import Base
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.authors import AuthorModel
+    from app.models.genres import GenreModel
 
 
 class BookModel(Base):
@@ -16,5 +21,4 @@ class BookModel(Base):
     authors: Mapped[list["AuthorModel"]] = relationship("AuthorModel", secondary=BooksAuthors.__tablename__,
                                                         back_populates="books")
     genres: Mapped[list["GenreModel"]] = relationship("GenreModel", secondary=BooksGenres.__tablename__,
-                                                     back_populates="books")
-
+                                                      back_populates="books")
