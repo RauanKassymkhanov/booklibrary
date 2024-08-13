@@ -30,6 +30,9 @@ ruff = "^0.5.5"
 line-length = 120
 lint.select = ["E", "W", "F"]
 
+[tool.ruff.format]
+quote-style = "double"
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 

@@ -20,12 +20,14 @@ def pytest_configure(config: pytest.Config):
     This hook is called for every plugin and initial conftest
     file after command line options have been parsed.
     """
-    os.environ['ENVIRONMENT'] = 'test'
-    os.environ['DATABASE_URL'] = 'postgresql+psycopg://postgres:postgres@postgres:5432/booklibrary_test'
-
+    os.environ["ENVIRONMENT"] = "test"
+    if os.getenv('CI', False):
+        os.environ["DATABASE_URL"] = "postgresql+psycopg://postgres:postgres@postgres:5432/booklibrary_test"
+    else:
+        os.environ["DATABASE_URL"] = "postgresql+psycopg://postgres:postgres@localhost:5433/booklibrary_test"
 
 def override_app_test_dependencies(app: FastAPI) -> None:
-    test_engine = create_async_engine(os.getenv('DATABASE_URL'), echo=True)
+    test_engine = create_async_engine(os.getenv("DATABASE_URL"), echo=True)
     test_session_maker = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
 
     async def override_get_session() -> AsyncSession:
@@ -35,7 +37,7 @@ def override_app_test_dependencies(app: FastAPI) -> None:
     app.dependency_overrides[get_session] = override_get_session
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 async def app() -> FastAPI:
     from app.main import create_app
 
@@ -45,7 +47,7 @@ async def app() -> FastAPI:
     yield _app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 async def client(app: FastAPI) -> AsyncClient:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url=TEST_HOST) as client:
@@ -63,7 +65,7 @@ def override_dependency(app: FastAPI, dependency: Callable, override: Callable):
     app.dependency_overrides[dependency] = override
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 async def session(app: FastAPI, _engine: AsyncEngine) -> AsyncIterable[AsyncSession]:
     connection = await _engine.connect()
     trans = await connection.begin()
@@ -81,7 +83,7 @@ async def session(app: FastAPI, _engine: AsyncEngine) -> AsyncIterable[AsyncSess
         await connection.close()
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 async def _engine() -> AsyncIterable[AsyncEngine]:
     settings = get_settings()
 
@@ -108,6 +110,6 @@ def find_migrations_script_location() -> str:
     return os.path.join(pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent, 'migrations')
 
 
-@pytest.fixture(scope='session', params=(DefaultEventLoopPolicy(),))
+@pytest.fixture(scope="session", params=(DefaultEventLoopPolicy(),))
 def event_loop_policy(request):
     return request.param
