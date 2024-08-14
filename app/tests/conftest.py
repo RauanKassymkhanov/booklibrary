@@ -11,7 +11,7 @@ from app.config import get_settings
 import os
 from app.database import get_session, get_alembic_config
 
-TEST_HOST = 'http://test'
+TEST_HOST = "http://test"
 
 
 def pytest_configure(config: pytest.Config):
@@ -21,10 +21,11 @@ def pytest_configure(config: pytest.Config):
     file after command line options have been parsed.
     """
     os.environ["ENVIRONMENT"] = "test"
-    if os.getenv('CI', False):
+    if os.getenv("CI", False):
         os.environ["DATABASE_URL"] = "postgresql+psycopg://postgres:postgres@postgres:5432/booklibrary_test"
     else:
         os.environ["DATABASE_URL"] = "postgresql+psycopg://postgres:postgres@localhost:5433/booklibrary_test"
+
 
 def override_app_test_dependencies(app: FastAPI) -> None:
     test_engine = create_async_engine(os.getenv("DATABASE_URL"), echo=True)
@@ -87,27 +88,24 @@ async def session(app: FastAPI, _engine: AsyncEngine) -> AsyncIterable[AsyncSess
 async def _engine() -> AsyncIterable[AsyncEngine]:
     settings = get_settings()
 
-    alembic_config = get_alembic_config(
-        settings.DATABASE_URL,
-        script_location=find_migrations_script_location()
-    )
+    alembic_config = get_alembic_config(settings.DATABASE_URL, script_location=find_migrations_script_location())
 
     engine = create_async_engine(settings.DATABASE_URL)
     async with engine.begin() as connection:
-        await connection.run_sync(lambda conn: downgrade(alembic_config, 'base'))
-        await connection.run_sync(lambda conn: upgrade(alembic_config, 'head'))
+        await connection.run_sync(lambda conn: downgrade(alembic_config, "base"))
+        await connection.run_sync(lambda conn: upgrade(alembic_config, "head"))
 
     try:
         yield engine
     finally:
         async with engine.begin() as connection:
-            await connection.run_sync(lambda conn: downgrade(alembic_config, 'base'))
+            await connection.run_sync(lambda conn: downgrade(alembic_config, "base"))
         await engine.dispose()
 
 
 def find_migrations_script_location() -> str:
     """Help find script location if tests was run by debugger or any other way except writing 'pytest' in cli"""
-    return os.path.join(pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent, 'migrations')
+    return os.path.join(pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent, "migrations")
 
 
 @pytest.fixture(scope="session", params=(DefaultEventLoopPolicy(),))
