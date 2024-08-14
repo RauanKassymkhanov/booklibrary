@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from app.api.exceptions import NotFoundError
 from app.api.genres.schemas import Genre, GenreCreate
-from app.api.genres.service import GenreService, GenreNotFoundError
+from app.api.genres.service import GenreService
 
 router = APIRouter(
     prefix="/genres",
@@ -22,7 +23,7 @@ async def create_genres(new_genre: GenreCreate, service: GenreService = Depends(
 async def get_genre(genre_id: int, service: GenreService = Depends()):
     try:
         return await service.get_genre(genre_id)
-    except GenreNotFoundError as e:
+    except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
 
 
@@ -30,7 +31,7 @@ async def get_genre(genre_id: int, service: GenreService = Depends()):
 async def delete_genre(genre_id: int, service: GenreService = Depends()):
     try:
         await service.delete_genre(genre_id)
-    except GenreNotFoundError as e:
+    except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
 
 
@@ -39,5 +40,5 @@ async def update_genre(genre_id: int, updated_genre: GenreCreate,
                        service: GenreService = Depends()):
     try:
         return await service.update_genre(genre_id, updated_genre)
-    except GenreNotFoundError as e:
+    except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
