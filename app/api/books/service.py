@@ -1,7 +1,6 @@
 from sqlalchemy import select, insert, update, delete
 from pydantic import TypeAdapter
 from sqlalchemy.orm import selectinload
-
 from app.models import AuthorModel, GenreModel
 from app.models.base import BooksAuthors, BooksGenres
 from app.models.books import BookModel

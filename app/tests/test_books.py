@@ -41,20 +41,28 @@ async def test_get_book_not_exist(client: AsyncClient, session: AsyncSession) ->
 
 
 async def test_create_book(client: AsyncClient, session: AsyncSession) -> None:
-    book_data = await create_test_book(session, title="book1")
+    author = await create_test_author(session, "author")
+    genre = await create_test_genre(session, "genre")
+
+    book_data = BookCreateFactory.build(session, title="book1", author_ids=[author.id], genre_ids=[genre.id])
+
     book_dict = book_data.model_dump()
     book_dict["published_date"] = book_dict["published_date"].isoformat()
 
+    response = await client.post("/books/", json=book_dict)
+    assert response.status_code == 201
+    created_book = response.json()
+
     expected_book = {
-        "id": book_data.id,
+        "id": created_book["id"],
         "title": book_data.title,
         "published_date": book_data.published_date.isoformat(),
         "description": book_data.description,
-        "authors": [{"bio": author.bio, "id": author.id, "name": author.name} for author in book_data.authors],
-        "genres": [{"id": genre.id, "name": genre.name} for genre in book_data.genres],
+        "authors": [{"bio": author.bio, "id": author.id, "name": author.name}],
+        "genres": [{"id": genre.id, "name": genre.name}],
     }
 
-    assert book_dict == expected_book
+    assert created_book == expected_book
 
 
 async def test_delete_book_success(client: AsyncClient, session: AsyncSession) -> None:
