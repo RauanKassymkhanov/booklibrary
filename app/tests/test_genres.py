@@ -4,7 +4,7 @@ from app.tests.factory_creators import create_test_genre
 
 
 async def test_get_genres(client: AsyncClient, session) -> None:
-    genre = await create_test_genre(session, 'Comedy')
+    genre = await create_test_genre(session, "Comedy")
     response = await client.get("/genres/")
     assert response.status_code == 200
     genres = response.json()

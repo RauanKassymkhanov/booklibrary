@@ -3,10 +3,7 @@ from app.api.exceptions import NotFoundError
 from app.api.genres.schemas import Genre, GenreCreate
 from app.api.genres.service import GenreService
 
-router = APIRouter(
-    prefix="/genres",
-    tags=["genres"]
-)
+router = APIRouter(prefix="/genres", tags=["genres"])
 
 
 @router.get("/", response_model=list[Genre])
@@ -36,8 +33,7 @@ async def delete_genre(genre_id: int, service: GenreService = Depends()):
 
 
 @router.put("/{genre_id}", response_model=Genre)
-async def update_genre(genre_id: int, updated_genre: GenreCreate,
-                       service: GenreService = Depends()):
+async def update_genre(genre_id: int, updated_genre: GenreCreate, service: GenreService = Depends()):
     try:
         return await service.update_genre(genre_id, updated_genre)
     except NotFoundError as e:

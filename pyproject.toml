@@ -21,14 +21,12 @@ pytest = "8.1.1"
 httpx = "^0.27.0"
 
 
-
-
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.5"
 
 [tool.ruff]
 line-length = 120
-lint.select = ["E", "W", "F"]
+lint.select = ["E", "W", "F", "T201"]
 
 [tool.ruff.format]
 quote-style = "double"

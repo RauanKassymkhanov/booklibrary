@@ -9,25 +9,21 @@ from app.api.exceptions import NotFoundError
 class AuthorService(BaseService):
     async def get_authors(self) -> list[Author]:
         query = select(AuthorModel)
-        result = await self._execute_in_session(query)
+        result = await self._session.execute(query)
         authors = result.scalars().all()
         return TypeAdapter(list[Author]).validate_python(authors)
 
     async def _get_author_or_raise(self, author_id: int) -> Author:
         query = select(AuthorModel).where(AuthorModel.id == author_id)
-        result = await self._execute_in_session(query)
+        result = await self._session.execute(query)
         author = result.scalar_one_or_none()
         if author is None:
             raise NotFoundError("Author", author_id)
         return Author.model_validate(author)
 
     async def create_author(self, new_author: AuthorCreate) -> Author:
-        query = (
-            insert(AuthorModel)
-            .values(**new_author.model_dump())
-            .returning(AuthorModel)
-        )
-        result = await self._execute_in_session(query)
+        query = insert(AuthorModel).values(**new_author.model_dump()).returning(AuthorModel)
+        result = await self._session.execute(query)
         created_author = result.scalar_one()
         return Author.model_validate(created_author)
 
@@ -37,7 +33,7 @@ class AuthorService(BaseService):
     async def delete_author(self, author_id: int) -> None:
         await self._get_author_or_raise(author_id)
         delete_query = delete(AuthorModel).where(AuthorModel.id == author_id)
-        await self._execute_in_session(delete_query)
+        await self._session.execute(delete_query)
 
     async def update_author(self, author_id: int, updated_author: AuthorCreate) -> Author:
         await self._get_author_or_raise(author_id)
@@ -47,7 +43,6 @@ class AuthorService(BaseService):
             .where(AuthorModel.id == author_id)
             .returning(AuthorModel)
         )
-        result = await self._execute_in_session(update_query)
+        result = await self._session.execute(update_query)
         updated_author = result.scalar_one()
         return Author.model_validate(updated_author)
-

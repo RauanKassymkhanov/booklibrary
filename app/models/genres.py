@@ -12,5 +12,6 @@ class GenreModel(Base):
     id: Mapped[Base.intpk]
     name: Mapped[Base.str32]
 
-    books: Mapped[list["BookModel"]] = relationship("BookModel",secondary=BooksGenres.__tablename__,
-                                                    back_populates="genres")
+    books: Mapped[list["BookModel"]] = relationship(
+        "BookModel", secondary=BooksGenres.__tablename__, back_populates="genres"
+    )

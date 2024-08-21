@@ -3,10 +3,7 @@ from app.api.authors.schemas import Author, AuthorCreate
 from app.api.authors.service import AuthorService
 from app.api.exceptions import NotFoundError
 
-router = APIRouter(
-    prefix="/authors",
-    tags=["authors"]
-)
+router = APIRouter(prefix="/authors", tags=["authors"])
 
 
 @router.get("/", response_model=list[Author])

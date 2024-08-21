@@ -15,6 +15,7 @@ class AuthorModel(Base):
     name: Mapped[Base.str32]
     bio: Mapped[str] = mapped_column(Text)
 
-    books: Mapped[list["BookModel"]] = relationship("BookModel", secondary=BooksAuthors.__tablename__,
-                                                    back_populates="authors")
+    books: Mapped[list["BookModel"]] = relationship(
+        "BookModel", secondary=BooksAuthors.__tablename__, back_populates="authors"
+    )
     subscriptions: Mapped[list["SubscriptionModel"]] = relationship("SubscriptionModel", back_populates="authors")

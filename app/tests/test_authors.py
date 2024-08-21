@@ -6,7 +6,7 @@ from app.tests.factory_creators import create_test_author
 
 
 async def test_get_authors(client: AsyncClient, session: AsyncSession) -> None:
-    author = await create_test_author(session, 'author1')
+    author = await create_test_author(session, "author1")
 
     response = await client.get("/authors/")
 
@@ -32,10 +32,9 @@ async def test_get_author_not_exist(client: AsyncClient, session: AsyncSession) 
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize("name", ["author1","author2","author3"])
+@pytest.mark.parametrize("name", ["author1", "author2", "author3"])
 async def test_create_author(client: AsyncClient, session: AsyncSession, name: str) -> None:
     response = await client.post("/authors/", json={"name": name, "bio": "bio"})
-
     assert response.status_code == 201
     created_author = response.json()
     assert (created_author["name"], created_author["bio"]) == (name, "bio")
