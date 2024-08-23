@@ -4,9 +4,11 @@ from sqlalchemy.orm import selectinload
 from app.api.authors.schemas import Author
 from app.api.books.schemas import FullBookInfo
 from app.api.genres.schemas import Genre
-from app.models import GenreModel, AuthorModel, BookModel
+from app.api.users.schemas import User
+from app.api.users.utils import get_password_hash
+from app.models import GenreModel, AuthorModel, BookModel, UserModel
 from app.models.base import BooksAuthors, BooksGenres
-from app.tests.factory_schemas import GenreCreateFactory, AuthorCreateFactory, BookCreateFactory
+from app.tests.factory_schemas import GenreCreateFactory, AuthorCreateFactory, BookCreateFactory, UserCreateFactory
 
 
 async def create_test_genre(session: AsyncSession, name: str | None) -> Genre:
@@ -52,3 +54,17 @@ async def create_test_book(session: AsyncSession, title: str | None) -> FullBook
     book = result.scalar()
 
     return FullBookInfo.model_validate(book)
+
+
+async def create_test_user(session: AsyncSession, username: str | None) -> User:
+    user = UserCreateFactory.build()
+    if username:
+        user.username = username
+    hashed_password = get_password_hash(user.password)
+    user_data = user.model_dump()
+    user_data["password_hash"] = hashed_password
+    del user_data["password"]
+
+    query = insert(UserModel).values(**user_data).returning(UserModel)
+    user_db = await session.scalar(query)
+    return User.model_validate(user_db)

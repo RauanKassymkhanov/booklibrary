@@ -6,6 +6,7 @@ from app.config import get_settings
 from app.database import get_alembic_config
 from app.api.authors import routes as authors_routes
 from app.api.books import routes as books_routes
+from app.api.users import routes as users_routes
 
 
 @asynccontextmanager
@@ -22,6 +23,7 @@ def create_app() -> FastAPI:
     app.include_router(genres_routes.router)
     app.include_router(authors_routes.router)
     app.include_router(books_routes.router)
+    app.include_router(users_routes.router)
     return app
 
 
