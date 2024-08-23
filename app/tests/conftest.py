@@ -26,6 +26,12 @@ def pytest_configure(config: pytest.Config):
     else:
         os.environ["DATABASE_URL"] = "postgresql+psycopg://postgres:postgres@localhost:5433/booklibrary_test"
 
+    os.environ["SECRET_KEY"] = "a78898ddc34197598e2ee4fd275990c3d7bf825370fca0e774b1c8f7dbb1e222"
+    os.environ["ALGORITHM"] = "HS256"
+    os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"] = "30"
+    os.environ["REFRESH_TOKEN_EXPIRE_DAYS"] = "7"
+    os.environ["DEFAULT_EXPIRE_MINUTES"] = "15"
+
 
 def override_app_test_dependencies(app: FastAPI) -> None:
     test_engine = create_async_engine(os.getenv("DATABASE_URL"), echo=True)

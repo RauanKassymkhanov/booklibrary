@@ -24,3 +24,9 @@ class PasswordException(Exception):
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
+
+
+class UnauthorizedException(Exception):
+    def __init__(self, message: str = "Could not validate credentials."):
+        self.message = message
+        super().__init__(self.message)
