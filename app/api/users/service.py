@@ -10,7 +10,7 @@ from app.api.exceptions import (
 )
 from app.api.users.schemas import User, UserCreate, UserUpdate, UserUpdatePassword
 from app.models import UserModel
-from app.api.users.utils import get_password_hash, verify_password
+from app.api.utils import get_password_hash, verify_password
 
 
 class UserService(BaseService):
