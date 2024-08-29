@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS SES CloudFormation Template for Multiple Email Notifications and Settings
+
+Parameters:
+  SubscribeTemplateName:
+    Type: String
+    Default: "SubscribeNotificationTemplate"
+  UnsubscribeTemplateName:
+    Type: String
+    Default: "UnsubscribeNotificationTemplate"
+  BookCreatedTemplateName:
+    Type: String
+    Default: "BookCreatedNotificationTemplate"
+  SESFromEmailAddress:
+    Type: String
+    Description: "The email address from which the notifications will be sent."
+  SESRegion:
+    Type: String
+    Default: "us-east-1"
+    Description: "The AWS region where SES is configured."
+
+Resources:
+  SubscribeTemplate:
+    Type: 'AWS::SES::Template'
+    Properties:
+      Template:
+        TemplateName: !Ref SubscribeTemplateName
+    DeletionPolicy: Retain
+
+  UnsubscribeTemplate:
+    Type: 'AWS::SES::Template'
+    Properties:
+      Template:
+        TemplateName: !Ref UnsubscribeTemplateName
+    DeletionPolicy: Retain
+
+  BookCreatedTemplate:
+    Type: 'AWS::SES::Template'
+    Properties:
+      Template:
+        TemplateName: !Ref BookCreatedTemplateName
+    DeletionPolicy: Retain
+
+  SESIdentity:
+    Type: "AWS::SES::EmailIdentity"
+    Properties:
+      EmailIdentity: !Ref SESFromEmailAddress
+    DeletionPolicy: Retain
+
+  SESConfigurationSet:
+    Type: "AWS::SES::ConfigurationSet"
+    Properties:
+      Name: "SESConfigurationSet"
+    DeletionPolicy: Retain
+
+Outputs:
+  SubscribeTemplateNameOutput:
+    Value: !Ref SubscribeTemplateName
+  UnsubscribeTemplateNameOutput:
+    Value: !Ref UnsubscribeTemplateName
+  BookCreatedTemplateNameOutput:
+    Value: !Ref BookCreatedTemplateName

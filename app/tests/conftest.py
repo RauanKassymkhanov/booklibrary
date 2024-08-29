@@ -31,6 +31,11 @@ def pytest_configure(config: pytest.Config):
     os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"] = "30"
     os.environ["REFRESH_TOKEN_EXPIRE_DAYS"] = "7"
     os.environ["DEFAULT_EXPIRE_MINUTES"] = "15"
+    os.environ["AWS_SES_VERIFIED_MAIL"] = "rauan.kassymkhanov@nixs.com"
+    os.environ["AWS_USER"] = "rauan.kassymkhanov"
+    os.environ["AWS_SES_REGION"] = "eu-north-1"
+    os.environ["AWS_ACCESS_KEY"] = "-"
+    os.environ["AWS_SECRET_KEY"] = "-"
 
 
 def override_app_test_dependencies(app: FastAPI) -> None:

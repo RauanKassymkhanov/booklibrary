@@ -13,14 +13,6 @@ class AuthorService(BaseService):
         authors = result.scalars().all()
         return TypeAdapter(list[Author]).validate_python(authors)
 
-    async def _get_author_or_raise(self, author_id: int) -> Author:
-        query = select(AuthorModel).where(AuthorModel.id == author_id)
-        result = await self._session.execute(query)
-        author = result.scalar_one_or_none()
-        if author is None:
-            raise NotFoundError("Author", author_id)
-        return Author.model_validate(author)
-
     async def create_author(self, new_author: AuthorCreate) -> Author:
         query = insert(AuthorModel).values(**new_author.model_dump()).returning(AuthorModel)
         result = await self._session.execute(query)
@@ -46,3 +38,11 @@ class AuthorService(BaseService):
         result = await self._session.execute(update_query)
         updated_author = result.scalar_one()
         return Author.model_validate(updated_author)
+
+    async def _get_author_or_raise(self, author_id: int) -> Author:
+        query = select(AuthorModel).where(AuthorModel.id == author_id)
+        result = await self._session.execute(query)
+        author = result.scalar_one_or_none()
+        if author is None:
+            raise NotFoundError("Author", author_id)
+        return Author.model_validate(author)

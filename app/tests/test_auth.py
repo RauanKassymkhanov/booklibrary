@@ -9,7 +9,7 @@ from app.config import get_settings
 from app.tests.factory_creators import create_test_user
 
 
-async def test_login_success(client: AsyncClient, session: AsyncSession):
+async def test_login_success(client: AsyncClient, session: AsyncSession) -> None:
     login_data = await create_test_user(session, username="testuser")
 
     response = await client.post("/login", data={"username": login_data.username, "password": "password123"})
@@ -18,7 +18,7 @@ async def test_login_success(client: AsyncClient, session: AsyncSession):
     assert "access_token", "refresh_token" in response.json()
 
 
-async def test_login_invalid_credentials(client: AsyncClient, session: AsyncSession):
+async def test_login_invalid_credentials(client: AsyncClient, session: AsyncSession) -> None:
     user = await create_test_user(session, username="testuser")
 
     response = await client.post("/login", data={"username": user.username, "password": "wrongpassword"})
@@ -27,7 +27,7 @@ async def test_login_invalid_credentials(client: AsyncClient, session: AsyncSess
     assert response.json() == {"detail": "Incorrect username or password"}
 
 
-async def test_access_with_valid_token(client: AsyncClient, session: AsyncSession):
+async def test_access_with_valid_token(client: AsyncClient, session: AsyncSession) -> None:
     settings = get_settings()
     user = await create_test_user(session, username="testuser")
 
@@ -41,7 +41,7 @@ async def test_access_with_valid_token(client: AsyncClient, session: AsyncSessio
     assert decoded_token["id"] == str(user.id)
 
 
-async def test_access_with_expired_token(client: AsyncClient, session: AsyncSession):
+async def test_access_with_expired_token(client: AsyncClient, session: AsyncSession) -> None:
     user = await create_test_user(session, username="testuser")
     access_token = create_access_token(data=TokenData(id=str(user.id)))
     with freeze_time(datetime.now(timezone.utc) + timedelta(minutes=31)):
@@ -53,17 +53,17 @@ async def test_access_with_expired_token(client: AsyncClient, session: AsyncSess
     assert response.json() == {"detail": "Token has expired."}
 
 
-async def test_access_with_invalid_token(client: AsyncClient):
+async def test_access_with_invalid_token(client: AsyncClient) -> None:
     invalid_token = "invalid.token.value"
     headers = {"Authorization": f"Bearer {invalid_token}"}
 
     response = await client.get("/me", headers=headers)
 
     assert response.status_code == 401
-    assert response.json() == {"detail": "Could not validate credentials."}
+    assert response.json() == {"detail": "Invalid Token"}
 
 
-async def test_refresh_token(client: AsyncClient, session: AsyncSession):
+async def test_refresh_token(client: AsyncClient, session: AsyncSession) -> None:
     settings = get_settings()
     user = await create_test_user(session, username="testuser")
 

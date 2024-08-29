@@ -1,12 +1,19 @@
-from unittest.mock import patch
+from unittest.mock import patch, AsyncMock
 import pytest
+from fastapi import BackgroundTasks
 from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.books.service import BookService
 from app.api.exceptions import NotFoundError
 from app.models import BookModel
-from app.tests.factory_creators import create_test_book, create_test_author, create_test_genre
+from app.tests.factory_creators import (
+    create_test_book,
+    create_test_author,
+    create_test_genre,
+    create_test_user,
+    subscribe_user_to_author,
+)
 from app.tests.factory_schemas import BookCreateFactory
 
 
@@ -40,9 +47,12 @@ async def test_get_book_not_exist(client: AsyncClient, session: AsyncSession) ->
     assert response.status_code == 404
 
 
-async def test_create_book(client: AsyncClient, session: AsyncSession) -> None:
+@patch("app.api.subscriptions.email_service.EmailService.send_email", new_callable=AsyncMock)
+async def test_create_book(mock_send_email, client: AsyncClient, session: AsyncSession) -> None:
     author = await create_test_author(session, "author")
     genre = await create_test_genre(session, "genre")
+    user = await create_test_user(session, username="testuser")
+    await subscribe_user_to_author(session, user_id=user.id, author_id=author.id)
 
     book_data = BookCreateFactory.build(session, title="book1", author_ids=[author.id], genre_ids=[genre.id])
 
@@ -63,6 +73,12 @@ async def test_create_book(client: AsyncClient, session: AsyncSession) -> None:
     }
 
     assert created_book == expected_book
+
+    mock_send_email.assert_called_once_with(
+        user.email,
+        f"New Book by {author.name}",
+        f"A new book titled '{book_data.title}' by {author.name} has been added to our library.\n\nCheck it out!",
+    )
 
 
 async def test_delete_book_success(client: AsyncClient, session: AsyncSession) -> None:
@@ -123,10 +139,11 @@ async def test_update_book_non_exist(client: AsyncClient, session: AsyncSession)
 async def test_create_book_transaction_rollback(session: AsyncSession) -> None:
     book_service = BookService(session)
     new_book = BookCreateFactory.build()
+    background_tasks = BackgroundTasks()
 
     with patch.object(book_service, "_validate_ids_or_raise", side_effect=NotFoundError("Author", {8000})):
         with pytest.raises(NotFoundError):
-            await book_service.create_book(new_book)
+            await book_service.create_book(new_book, background_tasks=background_tasks)
 
     query = select(BookModel).where(BookModel.title == new_book.title)
     result = await session.execute(query)

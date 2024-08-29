@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/", response_model=list[User])
-async def get_books(service: UserService = Depends()):
+async def get_users(service: UserService = Depends()):
     return await service.get_users()
 
 

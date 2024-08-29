@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from app.api.books.schemas import BookCreate, FullBookInfo
 from app.api.books.service import BookService
 from app.api.exceptions import NotFoundError
@@ -12,9 +12,9 @@ async def get_books(service: BookService = Depends()):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=FullBookInfo)
-async def create_book(new_book: BookCreate, service: BookService = Depends()):
+async def create_book(new_book: BookCreate, background_tasks: BackgroundTasks, service: BookService = Depends()):
     try:
-        book_created = await service.create_book(new_book)
+        book_created = await service.create_book(new_book, background_tasks)
     except NotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.message)
 

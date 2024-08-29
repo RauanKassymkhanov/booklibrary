@@ -1,13 +1,14 @@
+from datetime import datetime
+
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-
 from app.api.authors.schemas import Author
 from app.api.books.schemas import FullBookInfo
 from app.api.genres.schemas import Genre
 from app.api.users.schemas import User
 from app.api.utils import get_password_hash
-from app.models import GenreModel, AuthorModel, BookModel, UserModel
+from app.models import GenreModel, AuthorModel, BookModel, UserModel, SubscriptionModel
 from app.models.base import BooksAuthors, BooksGenres
 from app.tests.factory_schemas import GenreCreateFactory, AuthorCreateFactory, BookCreateFactory, UserCreateFactory
 
@@ -69,3 +70,12 @@ async def create_test_user(session: AsyncSession, username: str | None) -> User:
     query = insert(UserModel).values(**user_data).returning(UserModel)
     user_db = await session.scalar(query)
     return User.model_validate(user_db)
+
+
+async def subscribe_user_to_author(session: AsyncSession, user_id: str, author_id: int) -> None:
+    subscription_query = (
+        insert(SubscriptionModel)
+        .values(user_id=user_id, author_id=author_id, subscribed_date=datetime.now())
+        .returning(SubscriptionModel)
+    )
+    await session.execute(subscription_query)
