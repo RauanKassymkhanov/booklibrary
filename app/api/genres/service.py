@@ -12,14 +12,6 @@ class GenreService(BaseService):
         genres = result.scalars().all()
         return [Genre.model_validate(genre) for genre in genres]
 
-    async def _get_genre_or_raise(self, genre_id: int) -> Genre:
-        query = select(GenreModel).where(GenreModel.id == genre_id)
-        result = await self._session.execute(query)
-        genre = result.scalar_one_or_none()
-        if genre is None:
-            raise NotFoundError("Genre", genre_id)
-        return Genre.model_validate(genre)
-
     async def create_genre(self, new_genre: GenreCreate) -> Genre:
         query = insert(GenreModel).values(**new_genre.model_dump()).returning(GenreModel)
         result = await self._session.execute(query)
@@ -45,3 +37,11 @@ class GenreService(BaseService):
         result = await self._session.execute(update_query)
         updated_genre = result.scalar_one()
         return Genre.model_validate(updated_genre)
+
+    async def _get_genre_or_raise(self, genre_id: int) -> Genre:
+        query = select(GenreModel).where(GenreModel.id == genre_id)
+        result = await self._session.execute(query)
+        genre = result.scalar_one_or_none()
+        if genre is None:
+            raise NotFoundError("Genre", genre_id)
+        return Genre.model_validate(genre)

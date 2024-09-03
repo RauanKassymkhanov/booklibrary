@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
-from app.api.authentication.oauth2 import oauth2_scheme
+from app.api.authentication.oauth2 import oauth2_scheme, get_current_user
 from app.api.authentication.schemas import Token
 from app.api.authentication.service import UserLoginService
 from app.api.users.schemas import User
@@ -43,11 +43,10 @@ async def refresh_access_token(
 
 @router.get("/me", response_model=User)
 async def read_users_me(
-    token: str = Depends(oauth2_scheme),
-    token_service: UserLoginService = Depends(),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        return await token_service.get_current_user(token)
+        return current_user
     except UnauthorizedException as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

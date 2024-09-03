@@ -20,14 +20,6 @@ class UserService(BaseService):
         users = result.scalars().all()
         return TypeAdapter(list[User]).validate_python(users)
 
-    async def _get_user_or_raise(self, user_id: UUID) -> User:
-        query = select(UserModel).where(UserModel.id == user_id)
-        result = await self._session.execute(query)
-        user = result.scalar_one_or_none()
-        if user is None:
-            raise NotFoundError("User", user_id)
-        return User.model_validate(user)
-
     async def create_user(self, new_user: UserCreate) -> User:
         await self._check_for_existing_user(new_user.username, new_user.email)
 
@@ -80,6 +72,14 @@ class UserService(BaseService):
         updated_user = result.scalar_one()
 
         return User.model_validate(updated_user)
+
+    async def _get_user_or_raise(self, user_id: UUID) -> User:
+        query = select(UserModel).where(UserModel.id == user_id)
+        result = await self._session.execute(query)
+        user = result.scalar_one_or_none()
+        if user is None:
+            raise NotFoundError("User", user_id)
+        return User.model_validate(user)
 
     async def _check_existing_user(self, username: str, email: str, exclude_user_id: UUID = None) -> User:
         query = select(UserModel).where(or_(UserModel.username == username, UserModel.email == email))

@@ -23,6 +23,7 @@ passlib = "^1.7.4"
 pyjwt = "^2.9.0"
 python-multipart = "^0.0.9"
 freezegun = "^1.5.1"
+aiobotocore = "^2.14.0"
 
 
 [tool.poetry.group.dev.dependencies]
